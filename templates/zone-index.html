@@ -1,0 +1,76 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Zones Index</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> Overview
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <table class="table table-bordered table-responsive ">
+                    <thead>
+                        <tr>
+                            <th>domain</th>
+                            <th>name servers</th>
+                            <th>actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for zone in zones %}
+                        <tr>
+                            <td>{{ zone.domain }}</td>
+                            <td>
+                                {%for ns in zone.NS %}
+                                    {{ ns.content }}
+                                <br />
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="/zone-add?domain={{ zone.domain }}" class="btn btn-sm btn-warning">Edit</a>
+                                <button class="btn btn-sm btn-danger delete-domain"  data-domain="{{ zone.domain }}">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-8 -->
+</div>
+<!-- /.row -->
+
+<script>
+    $(function () {
+        $('.delete-domain').click(function () {
+            var row = $(this);
+            var domain = row.attr('data-domain');
+            if(confirm("Do you want to delete "+ domain +" ?")) {
+             $.ajax({
+                type: "POST",
+                url: "/zone-delete",
+                data: JSON.stringify({domain:domain}),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success : function(data){
+                    if(data == "0")
+                    {
+                        row.parents('tr').remove();
+                    }else {
+                        alert('we have an error!');
+                    }
+                }
+            });
+            }
+        });
+    });
+</script>

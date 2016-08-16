@@ -1,0 +1,233 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Add a new zone</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> Add Zone
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <form id="add-form">
+                  <div class="col-lg-12">
+                    <div class="input-group domain-input" >
+                      <input type="text" class="form-control" placeholder="Enter your domain name ..." id="domain">
+                      <span class="input-group-btn">
+                        <button class="btn btn-success" type="button" id="add-table">Add domain</button>
+                      </span>
+                    </div><!-- /input-group -->
+                      <div class="add-data" style="margin-top: 20px;display: none">
+                          <div class="input-group">
+                               <select name="type" class="form-control">
+                                  <option value="">Type</option>
+                                  <option value="A">A</option>
+                                  <option value="NS">NS</option>
+                                  <option value="SOA">SOA</option>
+                                  <option value="MX">MX</option>
+                                  <option value="TXT">TXT</option>
+                                  <option value="SRV">SRV</option>
+                                  <option value="CNAME">CNAME</option>
+                              </select>
+                              <span class="input-group-btn" style="width: 0;"></span>
+                              <input type="text" name="content" class="form-control" placeholder="content">
+                              <span class="input-group-btn A-Record" style="width: 0;"></span>
+                              <input type="text" name="ip" class="form-control A-Record" placeholder="ip">
+                              <span class="input-group-btn" style="width: 0;"></span>
+                              <input type="text" name="ttl" class="form-control" placeholder="ttl">
+                              <span class="input-group-btn">
+                                    <button class="btn btn-success" type="button" id="add-item">Add</button>
+                              </span>
+                          </div><!-- /input-group -->
+                      </div>
+                  </div><!-- /.col-lg-6 -->
+                </form>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-8 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div id="data">
+
+    </div>
+</div>
+
+<script type="application/xml" id="domain-table">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <b>
+                %%domain%%
+            </b>
+        </div>
+        <div class="panel-body">
+            <table  class="table table-bordered table-responsive table-striped table-hover">
+                <thead>
+                   <tr class="item text-center">
+                        <th class="col-md-3">TYPE</th>
+                        <th class="col-md-3">CONTENT</th>
+                        <th class="col-md-3">TTL</th>
+                        <th class="col-md-3">IP</th>
+                        <th class="col-md-3">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="items">
+
+                </tbody>
+
+            </table>
+            <div class="row">
+                <div class="col-lg-12">
+                    <button class="btn btn-info" id="save-data">Save data</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="application/xml" id="item-model">
+    <tr class="item text-center" style="height: 50px">
+        <td class="col-md-3">%%type%%</td>
+        <td class="col-md-3">%%content%%</td>
+        <td class="col-md-3">%%ttl%%</td>
+        <td class="col-md-3">%%ip%%</td>
+        <td class="col-md-3">
+            <button id="delete" class="btn btn-sm btn-danger" data-type="%%type%%" data-ip="%%ip%%" data-ttl="%%ttl%%" data-content="%%content%%">
+                X
+            </button>
+        </td>
+    </tr>
+</script>
+
+<script>
+    $(function () {
+        var handler = new Handler();
+
+        String.prototype.replaceAll = function(search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+
+        $('#data').on('click', '#delete', function () {
+            var selector = $(this);
+            var type = selector.attr('data-type');
+            var content = selector.attr('data-content');
+            var ttl = selector.attr('data-ttl');
+            handler.remove(type, content, ttl);
+            $(this).parents('tr').remove();
+        });
+
+        $('#add-table').click(function () {
+            var domain = $('#domain').val();
+            $('.domain-input').slideUp(500);
+            $('.add-data').slideDown(500);
+            var html = $('#domain-table').html();
+            html = html.replaceAll("%%domain%%", domain);
+            handler.setDomain(domain);
+            $('#data').html(html);
+        });
+
+        $('#add-form').on('click', '#add-item', function () {
+            var type =$("[name=type]").val();
+            var content =$("[name=content]").val();
+            var ip =$("[name=ip]").val();
+            var ttl =$("[name=ttl]").val();
+
+            handler.addItem(type, content,ttl,ip);
+
+            var html = $('#item-model').html();
+            html = html.replaceAll("%%type%%", type);
+            html = html.replaceAll("%%content%%", content);
+            html = html.replaceAll("%%ip%%", ip);
+            html = html.replaceAll("%%ttl%%", ttl);
+
+            $('#items').append(html);
+
+        });
+
+        $("[name=type]").change(function () {
+            if($(this).val() == "A"){
+                $('.A-Record').show();
+            } else {
+                $('.A-Record').hide();
+            }
+        });
+
+
+        {% if data %}
+            var json = JSON.parse('{{ data|tojson }}');
+            handler.load(json);
+
+            var domain = json.domain;
+            $('.domain-input').slideUp(500);
+            $('.add-data').slideDown(500);
+            var html = $('#domain-table').html();
+            html = html.replaceAll("%%domain%%", domain);
+            $('#data').html(html);
+
+        $.each(json, function(type, value) {
+            var content = "";
+            var ttl = "";
+            var ip = "";
+            if(type == 'domain'){
+
+            } else if(type == "SOA")
+            {
+                content = value.content;
+                ttl = value.ttl;
+                var html = $('#item-model').html();
+                html = html.replaceAll("%%type%%", type);
+                html = html.replaceAll("%%content%%", content);
+                html = html.replaceAll("%%ip%%", ip);
+                html = html.replaceAll("%%ttl%%", ttl);
+
+                $('#items').append(html);
+
+            } else {
+                json[type].forEach(function(item,index,arr){
+                    content = item.content;
+                    ttl = item.ttl;
+                    ip = item.ip | '';
+                    var html = $('#item-model').html();
+                    html = html.replaceAll("%%type%%", type);
+                    html = html.replaceAll("%%content%%", content);
+                    html = html.replaceAll("%%ip%%", ip);
+                    html = html.replaceAll("%%ttl%%", ttl);
+
+                    $('#items').append(html);
+                });
+            }
+        });
+
+        {% endif %}
+
+        $('#data').on('click', '#save-data', function(e){
+            $.ajax({
+                type: "POST",
+                url: "/zone-save",
+                data: handler.getJson(),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success : function(data){
+                    if(data == "0")
+                    {
+                        window.location = "/zone-index"
+                    }else {
+                        alert('we have an error!');
+                    }
+                }
+            });
+            e.preventDefault();
+        });
+
+    });
+</script>
