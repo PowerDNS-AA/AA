@@ -20,13 +20,13 @@ Handler.prototype.setDomain = function (name) {
   this.DB.domain = name
 };
 
-Handler.prototype.addItem = function (type, content, ttl, ip) {
+Handler.prototype.addItem = function (type, content, ttl, address) {
 
-    if(type == "A"){
+    if(type == "A" || type == "NS" || type == "MX" || type == "CNAME"){
           this.DB[type].push({
-              content:content,
+              address:address,
               ttl:ttl,
-              ip: ip
+              content: content
           });
     } else if (type == "SOA"){
         this.DB.SOA = {

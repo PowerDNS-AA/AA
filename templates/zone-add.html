@@ -18,6 +18,8 @@
                   <div class="col-lg-12">
                     <div class="input-group domain-input" >
                       <input type="text" class="form-control" placeholder="Enter your domain name ..." id="domain">
+                      <span class="input-group-btn" style="width: 0"></span>
+                      <input type="text" class="form-control" placeholder="SOA TTL" id="soa_ttl" value="1">
                       <span class="input-group-btn">
                         <button class="btn btn-success" type="button" id="add-table">Add domain</button>
                       </span>
@@ -28,16 +30,16 @@
                                   <option value="">Type</option>
                                   <option value="A">A</option>
                                   <option value="NS">NS</option>
-                                  <option value="SOA">SOA</option>
+{#                                  <option value="SOA">SOA</option>#}
                                   <option value="MX">MX</option>
                                   <option value="TXT">TXT</option>
                                   <option value="SRV">SRV</option>
                                   <option value="CNAME">CNAME</option>
                               </select>
                               <span class="input-group-btn" style="width: 0;"></span>
-                              <input type="text" name="content" class="form-control" placeholder="content">
+                              <input type="text" name="address" class="form-control A-Record" placeholder="address">
                               <span class="input-group-btn A-Record" style="width: 0;"></span>
-                              <input type="text" name="ip" class="form-control A-Record" placeholder="ip">
+                              <input type="text" name="content" class="form-control" placeholder="content">
                               <span class="input-group-btn" style="width: 0;"></span>
                               <input type="text" name="ttl" class="form-control" placeholder="ttl">
                               <span class="input-group-btn">
@@ -73,10 +75,10 @@
             <table  class="table table-bordered table-responsive table-striped table-hover">
                 <thead>
                    <tr class="item text-center">
+                        <th class="col-md-3">ADDRESS</th>
                         <th class="col-md-3">TYPE</th>
                         <th class="col-md-3">CONTENT</th>
                         <th class="col-md-3">TTL</th>
-                        <th class="col-md-3">IP</th>
                         <th class="col-md-3">ACTIONS</th>
                     </tr>
                 </thead>
@@ -96,10 +98,10 @@
 
 <script type="application/xml" id="item-model">
     <tr class="item text-center" style="height: 50px">
+        <td class="col-md-3">%%address%%</td>
         <td class="col-md-3">%%type%%</td>
         <td class="col-md-3">%%content%%</td>
         <td class="col-md-3">%%ttl%%</td>
-        <td class="col-md-3">%%ip%%</td>
         <td class="col-md-3">
             <button id="delete" class="btn btn-sm btn-danger" data-type="%%type%%" data-ip="%%ip%%" data-ttl="%%ttl%%" data-content="%%content%%">
                 X
@@ -127,40 +129,55 @@
         });
 
         $('#add-table').click(function () {
-            var domain = $('#domain').val();
+            var domain = $('#domain').val().toLowerCase();
+            var soa_ttl = $('#soa_ttl').val().toLowerCase();
             $('.domain-input').slideUp(500);
             $('.add-data').slideDown(500);
             var html = $('#domain-table').html();
             html = html.replaceAll("%%domain%%", domain);
             handler.setDomain(domain);
             $('#data').html(html);
+
+            var type ="SOA";
+            var content = "ns1."+domain+". hostmaster."+domain+". 2012081600 7200 3600 1209600 3600"
+            handler.addItem(type, content,soa_ttl,'');
+
+            html = $('#item-model').html();
+            html = html.replaceAll("%%type%%", type);
+            html = html.replaceAll("%%content%%", content);
+            html = html.replaceAll("%%address%%", '');
+            html = html.replaceAll("%%ttl%%", soa_ttl);
+
+            $('#items').append(html);
         });
 
         $('#add-form').on('click', '#add-item', function () {
             var type =$("[name=type]").val();
-            var content =$("[name=content]").val();
-            var ip =$("[name=ip]").val();
+            var content =$("[name=content]").val().toLowerCase();;
+            var address =$("[name=address]").val();
             var ttl =$("[name=ttl]").val();
 
-            handler.addItem(type, content,ttl,ip);
+            handler.addItem(type, content,ttl,address);
 
             var html = $('#item-model').html();
             html = html.replaceAll("%%type%%", type);
             html = html.replaceAll("%%content%%", content);
-            html = html.replaceAll("%%ip%%", ip);
+            html = html.replaceAll("%%address%%", address);
             html = html.replaceAll("%%ttl%%", ttl);
 
             $('#items').append(html);
 
         });
 
-        $("[name=type]").change(function () {
-            if($(this).val() == "A"){
-                $('.A-Record').show();
-            } else {
-                $('.A-Record').hide();
-            }
-        });
+{#        $("[name=type]").change(function () {#}
+{#            if($(this).val() == "A"){#}
+{#                $('.A-Record').show();#}
+{#            } else if ($(this).val() == "NS" ){#}
+{#                $('.A-Record').show();#}
+{#            } else {#}
+{#                $('.A-Record').hide();#}
+{#            }#}
+{#        });#}
 
 
         {% if data %}
@@ -187,7 +204,7 @@
                 var html = $('#item-model').html();
                 html = html.replaceAll("%%type%%", type);
                 html = html.replaceAll("%%content%%", content);
-                html = html.replaceAll("%%ip%%", ip);
+                html = html.replaceAll("%%address%%", '');
                 html = html.replaceAll("%%ttl%%", ttl);
 
                 $('#items').append(html);
@@ -196,11 +213,11 @@
                 json[type].forEach(function(item,index,arr){
                     content = item.content;
                     ttl = item.ttl;
-                    ip = item.ip | '';
+                    address = item.address;
                     var html = $('#item-model').html();
                     html = html.replaceAll("%%type%%", type);
                     html = html.replaceAll("%%content%%", content);
-                    html = html.replaceAll("%%ip%%", ip);
+                    html = html.replaceAll("%%address%%", address);
                     html = html.replaceAll("%%ttl%%", ttl);
 
                     $('#items').append(html);

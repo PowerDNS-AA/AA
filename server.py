@@ -1,8 +1,12 @@
 import os
+
+import tldextract as tldextract
 from flask import Flask, render_template, request
 from flask import json
 from flask import send_from_directory
 from jinja2 import Template
+
+from libs.classes import Resolve
 
 app = Flask(__name__)
 
@@ -60,6 +64,17 @@ def zone_delete():
         os.remove('zones/' + data['domain'] + ".json")
         return "0"
     return "1"
+
+
+@app.route("/api/v1/initialize")
+def initialize():
+    return "0"
+
+
+@app.route("/api/v1/lookup/<domain>/<type>")
+def lookup(domain, type):
+    resolve = Resolve(domain=domain, type=type)
+    return json.dumps({'result': resolve.lookup().response})
 
 
 if __name__ == "__main__":
