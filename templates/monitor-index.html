@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Monitors Index</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> Overview
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <table class="table table-bordered table-responsive ">
+                    <thead>
+                        <tr>
+                            <th>domain</th>
+                            <th>content</th>
+                            <th>actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for monitor in monitors %}
+                        <tr>
+                            <td>{{ monitor.domain }}</td>
+                            <td>
+                                {%for content in monitor.A %}
+                                    {{ content }}
+                                <br />
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="/monitor-add?domain={{ monitor.domain }}" class="btn btn-sm btn-warning">Edit</a>
+                                <button class="btn btn-sm btn-danger delete-domain"  data-domain="{{ monitor.domain }}">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-8 -->
+</div>
+<!-- /.row -->
+

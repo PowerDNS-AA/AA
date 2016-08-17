@@ -16,11 +16,7 @@ class Resolve(object):
         self.response = []
 
     def lookup(self):
-        if self.type == "a" or self.type == "any":
-            self.parse_a_records()
-        elif self.type == "ns":
-            self.parse_ns_records()
-
+        self.parse_records()
         return self
 
     def get_standard_domain(self):
@@ -33,21 +29,39 @@ class Resolve(object):
         with open(self.get_config_file_address()) as data_file:
             return json.load(data_file)
 
-    def parse_a_records(self):
-        for value in self.get_config_file_content()['A']:
-            if self.subDomain == value['address'] or self.inputDomain + '.' == value['address']:
-                self.response.append({
-                    "qtype": "A",
-                    "qname": value['address'],
-                    "content": value['content'],
-                    "ttl": value['ttl']
-                })
+    def parse_records(self):
+        type = self.get_standard_type()
+        for value in self.get_config_file_content()[type]:
+            if type == "A" and self.subDomain != value['address'] and self.inputDomain + '.' != value['address']:
+                continue
 
-    def parse_ns_records(self):
-        for value in self.get_config_file_content()['NS']:
             self.response.append({
-                "qtype": "NS",
+                "qtype": type,
                 "qname": value['address'],
                 "content": value['content'],
                 "ttl": value['ttl']
             })
+
+    def get_standard_type(self):
+        if self.type == "a" or self.type == 'any':
+            return "A"
+        elif self.type == "ns":
+            return "NS"
+        elif self.type == "mx":
+            return "MX"
+        elif self.type == "soa":
+            return "SOA"
+        elif self.type == "cname":
+            return "CNAME"
+        elif self.type == "srv":
+            return "SRV"
+        elif self.type == "txt":
+            return "TXT"
+        else:
+            return None
+
+
+class Monitor(object):
+
+    def __init__(self):
+        pass
