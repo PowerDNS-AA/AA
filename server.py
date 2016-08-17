@@ -66,6 +66,29 @@ def zone_delete():
     return "1"
 
 
+@app.route("/monitor-index")
+def monitor_index():
+    data = []
+    for dirname, dirnames, filenames in os.walk('monitors'):
+        for filename in filenames:
+            with open('monitors/' + filename) as data_file:
+                temp = json.load(data_file)
+
+                if os.path.exists('zones/' + temp['domain'] + ".json"):
+                    with open('zones/' + temp['domain'] + ".json") as data_file:
+                        zone = json.load(data_file)
+                        for i in zone["A"]:
+                            if i['address'] == temp['subDomain'] or i['address'] == temp['domain'] + ".":
+                                domainARecord = i['content']
+                                break
+                print(domainARecord)
+                if domainARecord and domainARecord not in temp['A']:
+                    temp['A'].append(domainARecord)
+                data.append(temp)
+
+    return render_template("index.html", content="monitor-index.html", monitors=data)
+
+
 @app.route("/api/v1/initialize")
 def initialize():
     return "0"
@@ -78,4 +101,4 @@ def lookup(domain, type):
 
 
 if __name__ == "__main__":
-    app.run(port=4998, host="0.0.0.0")
+    app.run(port=4998, host="127.0.0.1")
