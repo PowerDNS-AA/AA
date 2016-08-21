@@ -93,7 +93,7 @@ def initialize():
     print(request.form)
 
 
-@app.route("/api/v1/lookup/<domain>/<type>")
+@app.route("/api/v1/lookup/<domain>./<type>")
 def lookup(domain, type):
     resolve = Resolve(domain=domain, type=type)
     return json.dumps({'result': resolve.lookup().response})
