@@ -1,10 +1,8 @@
 import os
 
-import tldextract as tldextract
 from flask import Flask, render_template, request
 from flask import json
 from flask import send_from_directory
-from jinja2 import Template
 
 from libs.classes import Resolve
 
@@ -91,7 +89,8 @@ def monitor_index():
 
 @app.route("/api/v1/initialize")
 def initialize():
-    return "0"
+    print(request.json)
+    print(request.form)
 
 
 @app.route("/api/v1/lookup/<domain>/<type>")
