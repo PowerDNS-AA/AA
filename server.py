@@ -86,18 +86,16 @@ def monitor_index():
 
     return render_template("index.html", content="monitor-index.html", monitors=data)
 
-
-@app.route("/api/v1/initialize")
-def initialize():
-    print(request.json)
-    print(request.form)
-
-
 @app.route("/api/v1/lookup/<domain>./<type>")
 def lookup(domain, type):
     resolve = Resolve(domain=domain, type=type)
     return json.dumps({'result': resolve.lookup().response})
 
 
+@app.route("/api/v1/getDomainMetadata/<domain>./<type>")
+def get_domain_metadata(domain, type):
+    return json.dumps({'result': 0})
+
+
 if __name__ == "__main__":
-    app.run(port=4998, host="127.0.0.1")
+    app.run(port=4998, host="0.0.0.0")
