@@ -89,16 +89,16 @@ def monitor_index():
 
 @app.route("/api/v1/lookup/<domain>./<type>")
 def lookup(domain, type):
-    print type
-    print domain
+    print(type)
+    print(domain)
     resolve = Resolve(domain=domain, type=type)
     return json.dumps({'result': resolve.lookup().response})
 
 
 @app.route("/api/v1/getDomainMetadata/<domain>./<type>")
 def get_domain_metadata(domain, type):
-    print domain
-    print type
+    print(type)
+    print(domain)
     if type == "NSEC3PARAM":
         return json.dumps({'result': "1 0 5 DEADBE"})
     elif type == "NSEC3NARROW":
