@@ -86,6 +86,7 @@ def monitor_index():
 
     return render_template("index.html", content="monitor-index.html", monitors=data)
 
+
 @app.route("/api/v1/lookup/<domain>./<type>")
 def lookup(domain, type):
     resolve = Resolve(domain=domain, type=type)
@@ -94,7 +95,14 @@ def lookup(domain, type):
 
 @app.route("/api/v1/getDomainMetadata/<domain>./<type>")
 def get_domain_metadata(domain, type):
-    return json.dumps({'result': 0})
+    if type == "NSEC3PARAM":
+        return json.dumps({'result': "1 0 5 DEADBE"})
+    elif type == "NSEC3NARROW":
+        return json.dumps({'result': 1})
+    elif type == "PRESIGNED":
+        return json.dumps({'result': 1})
+    else:
+        return json.dumps({'result': 0})
 
 
 if __name__ == "__main__":
