@@ -105,5 +105,11 @@ def get_domain_metadata(domain, type):
         return json.dumps({'result': 0})
 
 
+@app.route("/api/v1/test")
+def initialize():
+    print(request.json)
+    print(request.form)
+
+
 if __name__ == "__main__":
     app.run(port=4998, host="0.0.0.0")
