@@ -56,17 +56,17 @@ class Resolve(object):
     def get_standard_type(self):
         if self.type == "a" or self.type == 'any':
             return "A"
-        elif self.type == "ns":
+        elif self.type == "ns" or self.type == 'any':
             return "NS"
-        elif self.type == "mx":
+        elif self.type == "mx" or self.type == 'any':
             return "MX"
-        elif self.type == "soa":
+        elif self.type == "soa" or self.type == 'any':
             return "SOA"
-        elif self.type == "cname":
+        elif self.type == "cname" or self.type == 'any':
             return "CNAME"
-        elif self.type == "srv":
+        elif self.type == "srv" or self.type == 'any':
             return "SRV"
-        elif self.type == "txt":
+        elif self.type == "txt" or self.type == 'any':
             return "TXT"
         else:
             return None
